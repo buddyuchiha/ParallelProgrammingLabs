@@ -7,6 +7,18 @@
 
 using namespace std; 
 
+vector<vector<int>> GenerateMatrix(int size) {
+    int rows = 100;
+    int columns = 100;
+    vector<vector<int>> matrix(rows, vector<int>(columns));
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            matrix[i][j] = rand() % 100;
+        }
+    }
+    return matrix;
+}
+
 vector<vector<int>> CreateMatrix(string path){
     ifstream infile(path);
     if (!infile.is_open()) {
@@ -60,8 +72,10 @@ void PrintMatrix(vector<vector<int>> matrix) {
     cout << " " << endl;
 }
 
-void WriteMatrix(string path, vector<vector<int>> matrix, int duration) {
-    ofstream outfile(path); 
+void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
+    string file_path = path + to_string(size) + ".txt";
+    cout << file_path;
+    ofstream outfile(file_path, ios::app);
     if (!outfile.is_open()) {
         throw "File not found";
     }
@@ -72,31 +86,39 @@ void WriteMatrix(string path, vector<vector<int>> matrix, int duration) {
         outfile << "\n";
     }
     outfile << "\n";
-    outfile << duration;
+    outfile.close();
+}
+
+void WriteTime(string path, int size, int time) {
+    string file_path = path + to_string(size) + ".txt";
+    cout << file_path;
+    ofstream outfile(file_path, ios::app);
+    if (!outfile.is_open()) {
+        throw "File not found";
+    }
+    outfile << time;
+    outfile << "\n";
     outfile.close();
 }
 
 
-
 int main()
 {
-    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\first_matrix_values.txt";
-    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\second_matrix_values.txt";
-    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\output\\result.txt";
-   
-    vector<vector<int>> first_matrix = CreateMatrix(first_matrix_path);
-    PrintMatrix(first_matrix);
-    vector<vector<int>> second_matrix = CreateMatrix(second_matrix_path);
-    PrintMatrix(second_matrix);
+    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\first_matrix\\first_matrix";
+    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
+    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\output\\result\\result";
+    string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\output\\time\\time";
 
-    auto start = std::chrono::high_resolution_clock::now();
-    vector<vector<int>> result_matrix = MultyMatrx(first_matrix, second_matrix);
-    auto end = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration<double>(end - start);
-    PrintMatrix(result_matrix);
+    int EXPIREMENTS_COUNTS = 10;
+    int size = 100;
 
-    WriteMatrix(result_path, result_matrix, duration.count());
-
+    for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
+        vector<vector<int>> first_matrix = GenerateMatrix(size);
+        WriteMatrix(first_matrix_path, size, first_matrix);
+        vector<vector<int>> second_matrix = GenerateMatrix(size);
+        WriteMatrix(second_matrix_path, size, second_matrix);
+    }
+    cout << "complete" << endl;
 }
 
 

@@ -24,11 +24,5 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
-    <Text Include="first_matrix_values.txt">
-      <Filter>input</Filter>
-    </Text>
-    <Text Include="second_matrix_values.txt">
-      <Filter>input</Filter>
-    </Text>
   </ItemGroup>
 </Project>
