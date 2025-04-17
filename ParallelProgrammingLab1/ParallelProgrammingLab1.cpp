@@ -1,19 +1,27 @@
 ﻿#include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std; 
 
-vector<vector<int>> CreateMatrix() {
-    int columns, rows;
-    cout << "Input the number of rows: " << endl;
-    cin >> rows;
-    cout << "Input the number of columns: " << endl;
-    cin >> columns;
-    vector<vector<int>> matrix(rows, vector<int>(columns));
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            matrix[i][j] = rand() % 100;
+vector<vector<int>> CreateMatrix(string path){
+    ifstream infile(path);
+    if (!infile.is_open()) {
+        throw "File found error";
+    }
+    string line;
+    vector <vector<int>> matrix;
+    while (getline(infile, line)) {
+        istringstream iss(line);
+        vector<int> row;
+        int number;
+
+        while (iss >> number) {  
+            row.push_back(number);
         }
+        matrix.push_back(row);
     }
     return matrix;
 }
@@ -47,13 +55,16 @@ void PrintMatrix(vector<vector<int>> matrix) {
         }
         cout << "" << endl;
     }
+    cout << " " << endl;
 }
 
 int main()
 {
-    vector<vector<int>> first_matrix = CreateMatrix();
+    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\first_matrix_values.txt";
+    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\second_matrix_values.txt";
+    vector<vector<int>> first_matrix = CreateMatrix(first_matrix_path);
     PrintMatrix(first_matrix);
-    vector<vector<int>> second_matrix = CreateMatrix();
+    vector<vector<int>> second_matrix = CreateMatrix(second_matrix_path);
     PrintMatrix(second_matrix);
     vector<vector<int>> result_matrix = MultyMatrx(first_matrix, second_matrix);
     PrintMatrix(result_matrix);

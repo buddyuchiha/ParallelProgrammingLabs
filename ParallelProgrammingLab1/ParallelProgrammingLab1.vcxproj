@@ -131,6 +131,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
+    <Text Include="first_matrix_values.txt" />
+    <Text Include="second_matrix_values.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
