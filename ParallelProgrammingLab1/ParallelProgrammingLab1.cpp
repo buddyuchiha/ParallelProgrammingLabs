@@ -74,7 +74,6 @@ void PrintMatrix(vector<vector<int>> matrix) {
 
 void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
     string file_path = path + to_string(size) + ".txt";
-    cout << file_path;
     ofstream outfile(file_path, ios::app);
     if (!outfile.is_open()) {
         throw "File not found";
@@ -91,7 +90,6 @@ void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
 
 void WriteTime(string path, int size, int time) {
     string file_path = path + to_string(size) + ".txt";
-    cout << file_path;
     ofstream outfile(file_path, ios::app);
     if (!outfile.is_open()) {
         throw "File not found";
@@ -117,6 +115,13 @@ int main()
         WriteMatrix(first_matrix_path, size, first_matrix);
         vector<vector<int>> second_matrix = GenerateMatrix(size);
         WriteMatrix(second_matrix_path, size, second_matrix);
+        auto start = std::chrono::high_resolution_clock::now();
+        vector<vector<int>> result = MultyMatrx(first_matrix, second_matrix);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        WriteMatrix(result_path, size, result);
+        WriteTime(time_path, size, duration_ms.count());
+        size += 100;
     }
     cout << "complete" << endl;
 }
