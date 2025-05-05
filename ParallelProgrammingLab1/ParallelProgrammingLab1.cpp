@@ -8,8 +8,8 @@
 using namespace std; 
 
 vector<vector<int>> GenerateMatrix(int size) {
-    int rows = 100;
-    int columns = 100;
+    int rows = size;
+    int columns = size;
     vector<vector<int>> matrix(rows, vector<int>(columns));
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -101,11 +101,11 @@ void WriteTime(string path, int size, int time) {
 
 
 int main()
-{
-    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\first_matrix\\first_matrix";
-    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
-    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\output\\result\\result";
-    string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\ParallelProgrammingLab1\\output\\time\\time";
+{                               
+    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\input\\first_matrix\\first_matrix";
+    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
+    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\result\\result";
+    string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\time\\time";
 
     int EXPIREMENTS_COUNTS = 10;
     int size = 100;
