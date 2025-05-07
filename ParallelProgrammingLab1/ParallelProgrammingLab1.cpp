@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <omp.h>
 
 using namespace std; 
 
@@ -49,7 +50,9 @@ vector<vector<int>> MultyMatrix(vector<vector<int>> first_matrix, vector<vector<
         throw "first_columns != second_rows";
     }  
     vector<vector<int>> result_matrix(second_rows, vector<int>(first_columns));
+    #pragma omp parallel for
     for (int i = 0; i < first_rows; i++) {
+        int sum = 0;
         for (int j = 0; j < second_columns; j++) {
             result_matrix[i][j] = 0;
             for (int k = 0 ; k < first_rows; k++) {
@@ -74,7 +77,7 @@ void PrintMatrix(vector<vector<int>> matrix) {
 
 void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
     string file_path = path + to_string(size) + ".txt";
-    ofstream outfile(file_path, ios::app);
+    ofstream outfile(file_path);
     if (!outfile.is_open()) {
         throw "File not found";
     }
@@ -90,7 +93,7 @@ void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
 
 vector<vector<int>> ReadMatrix(string path, int size) {
     string file_path = path + to_string(size) + ".txt";
-    ifstream infile(file_path);
+    ifstream infile(file_path, ios::out);
     if (!infile.is_open()) {
         throw "File not found";
     }
@@ -123,27 +126,26 @@ int main()
     string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
     string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\result\\result";
     string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\time\\time";
+    string open_mp_path_2 = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\open_mp\\open_mp_2\\time";
+    string open_mp_path_4 = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\open_mp\\open_mp_4\\time";
+    string open_mp_path_6 = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\open_mp\\open_mp_6\\time";
+    string open_mp_path_8 = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\open_mp\\open_mp_8\\time";
 
     int EXPIREMENTS_COUNTS = 10;
     int size = 100;
-    vector<vector<int>> test_matrix = ReadMatrix(first_matrix_path, 100);
-    vector<vector<int>> test_matrix1 = ReadMatrix(second_matrix_path, 100);
-    vector<vector<int>> test_matrix2 = MultyMatrix(test_matrix, test_matrix1);
-    PrintMatrix(test_matrix2);
+    omp_set_num_threads(8);
 
-    //for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
-    //    vector<vector<int>> first_matrix = GenerateMatrix(size);
-    //    WriteMatrix(first_matrix_path, size, first_matrix);
-    //    vector<vector<int>> second_matrix = GenerateMatrix(size);
-    //    WriteMatrix(second_matrix_path, size, second_matrix);
-    //    auto start = std::chrono::high_resolution_clock::now();
-    //    vector<vector<int>> result = MultyMatrx(first_matrix, second_matrix);
-    //    auto end = std::chrono::high_resolution_clock::now();
-    //    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    //    WriteMatrix(result_path, size, result);
-    //    WriteTime(time_path, size, duration_ms.count());
-    //    size += 100;
-    //}
+    for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
+        vector<vector<int>> first_matrix = ReadMatrix(first_matrix_path, size);
+        vector<vector<int>> second_matrix = ReadMatrix(second_matrix_path, size);
+        auto start = std::chrono::high_resolution_clock::now();
+        vector<vector<int>> result = MultyMatrix(first_matrix, second_matrix);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        WriteTime(open_mp_path_8, size, duration_ms.count());
+        cout << "Size: " << size << " Time: " << duration_ms.count() << endl;
+        size += 100;
+    }
     cout << "complete" << endl;
 }
 
