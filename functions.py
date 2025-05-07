@@ -1,4 +1,5 @@
 import numpy as np 
+import matplotlib.pyplot as plt
 
 
 def read_matrix(matrix_path: str) -> np.array:
@@ -53,3 +54,23 @@ def result_checker(first_matrix_path: str, second_matrix_path: str, result_matri
     return np.array_equal(np.dot(first_matrix, second_matrix), result_matrix)
 
 
+def show_openmp_graph(time_path: str) -> None:
+    """
+    Showing open mp results graph
+
+    Args:
+        time_path (str) : The path of the time
+
+    """
+    x = []
+    y = []
+    core = time_path[-1]
+    for size in range(100, 1100, 100):
+        x.append(size)
+        path = f"{time_path}\\time{size}.txt"
+        y.append(read_time(path))
+
+    plt.plot(x, y, label="result", color="blue")
+    plt.xlabel("Размер матрицы")
+    plt.ylabel("time in ms")
+    plt.title(f"Результат использования технологии OpenMP с {core} ядрами")
