@@ -40,7 +40,7 @@ vector<vector<int>> CreateMatrix(string path){
     return matrix;
 }
 
-vector<vector<int>> MultyMatrx(vector<vector<int>> first_matrix, vector<vector<int>> second_matrix) {
+vector<vector<int>> MultyMatrix(vector<vector<int>> first_matrix, vector<vector<int>> second_matrix) {
     int first_columns = first_matrix.size();
     int second_columns = second_matrix.size();
     int first_rows = first_matrix[0].size();
@@ -88,6 +88,23 @@ void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
     outfile.close();
 }
 
+vector<vector<int>> ReadMatrix(string path, int size) {
+    string file_path = path + to_string(size) + ".txt";
+    ifstream infile(file_path);
+    if (!infile.is_open()) {
+        throw "File not found";
+    }
+    vector<vector<int>> matrix(size, vector<int>(size));
+    int rows = size;
+    int columns = size;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            infile >> matrix[i][j];
+        }
+    }
+    return matrix;
+}
+
 void WriteTime(string path, int size, int time) {
     string file_path = path + to_string(size) + ".txt";
     ofstream outfile(file_path, ios::app);
@@ -109,20 +126,24 @@ int main()
 
     int EXPIREMENTS_COUNTS = 10;
     int size = 100;
+    vector<vector<int>> test_matrix = ReadMatrix(first_matrix_path, 100);
+    vector<vector<int>> test_matrix1 = ReadMatrix(second_matrix_path, 100);
+    vector<vector<int>> test_matrix2 = MultyMatrix(test_matrix, test_matrix1);
+    PrintMatrix(test_matrix2);
 
-    for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
-        vector<vector<int>> first_matrix = GenerateMatrix(size);
-        WriteMatrix(first_matrix_path, size, first_matrix);
-        vector<vector<int>> second_matrix = GenerateMatrix(size);
-        WriteMatrix(second_matrix_path, size, second_matrix);
-        auto start = std::chrono::high_resolution_clock::now();
-        vector<vector<int>> result = MultyMatrx(first_matrix, second_matrix);
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        WriteMatrix(result_path, size, result);
-        WriteTime(time_path, size, duration_ms.count());
-        size += 100;
-    }
+    //for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
+    //    vector<vector<int>> first_matrix = GenerateMatrix(size);
+    //    WriteMatrix(first_matrix_path, size, first_matrix);
+    //    vector<vector<int>> second_matrix = GenerateMatrix(size);
+    //    WriteMatrix(second_matrix_path, size, second_matrix);
+    //    auto start = std::chrono::high_resolution_clock::now();
+    //    vector<vector<int>> result = MultyMatrx(first_matrix, second_matrix);
+    //    auto end = std::chrono::high_resolution_clock::now();
+    //    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    //    WriteMatrix(result_path, size, result);
+    //    WriteTime(time_path, size, duration_ms.count());
+    //    size += 100;
+    //}
     cout << "complete" << endl;
 }
 
