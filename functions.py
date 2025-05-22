@@ -1,5 +1,6 @@
 import numpy as np 
-
+import matplotlib.pyplot as plt
+import re
 
 def read_matrix(matrix_path: str) -> np.array:
     """
@@ -33,6 +34,27 @@ def read_time(time_path: str) -> int:
             time += string 
     return int(time)
 
+def read_mpi_time(time_path: str) -> int:
+    """
+    Reading time from file 
+
+    Args:
+        time_path (str) : The path of the time
+
+    Returns:
+        time
+    
+    """
+    result = ''
+    with open(time_path, 'r') as file_data:
+        text = file_data.read()
+        times = re.findall(r'Time: (\d+) ms', text)
+        for time in times:
+           result += time
+           result += ' '
+    return result
+
+
 
 def result_checker(first_matrix_path: str, second_matrix_path: str, result_matrix_path: str) -> bool:
     """
@@ -51,5 +73,48 @@ def result_checker(first_matrix_path: str, second_matrix_path: str, result_matri
     second_matrix = read_matrix(second_matrix_path)
     result_matrix = read_matrix(result_matrix_path)
     return np.array_equal(np.dot(first_matrix, second_matrix), result_matrix)
+
+
+def show_mpi_graph(time_path: str) -> None:
+    """
+    Showing mpi results graph
+
+    Args:
+        time_path (str) : The path of the time
+
+    """
+    x = []
+    y = []
+    core = time_path[-1]
+    for size in range(100, 1100, 100):
+        x.append(size)
+        path = f"{time_path}\\mpi_time{size}.txt"
+        y.append(read_time(path))
+
+    plt.plot(x, y, label="result", color="blue")
+    plt.xlabel("Размер матрицы")
+    plt.ylabel("time in ms")
+    plt.title(f"Результат использования технологии MPI с {core} ядрами")
+
+
+def show_mpi_korolev_graph(time_path: str) -> None:
+    """
+    Showing mpi Korolev's results graph
+
+    Args:
+        time_path (str) : The path of the time
+
+    """
+    core = re.findall(r'\\(\d+).txt', time_path)
+    text = read_mpi_time(time_path)
+    y = [int(num) for num in text.split()]
+    x = []
+    for size in range(100, 1100, 100):
+        x.append(size)
+
+    plt.plot(x, y, label="result", color="blue")
+    plt.xlabel("Размер матрицы")
+    plt.ylabel("time in ms")
+    plt.title(f"Результат использования технологии MPI на суперкомпьютере с {core[0]} ядрами")
 
 
