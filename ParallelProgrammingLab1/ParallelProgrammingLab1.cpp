@@ -153,31 +153,111 @@ void WriteTime(string path, int size, int time) {
     outfile.close();
 }
 
+void WriteTimeMPI(string path, int size, int time, int num_processes) {
+    string file_path = path + to_string(num_processes) + "\\mpi_time" + to_string(size) + ".txt";
+    ofstream outfile(file_path, ios::app);
+    if (!outfile.is_open()) {
+        throw "File not found";
+    }
+    outfile << time;
+    outfile << "\n";
+    outfile.close();
+}
 
-int main()
-{                               
-    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\input\\first_matrix\\first_matrix";
-    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
-    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\result\\result";
-    string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs-1\\ParallelProgrammingLab1\\output\\time\\time";
 
+
+int main(int argc, char** argv)
+{      
+    MPI_Init(&argc, &argv);
+
+    int world_size, world_rank;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    cout << "Total processes: " << world_size << endl;
+
+    string first_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\input\\first_matrix\\first_matrix";
+    string second_matrix_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\input\\second_matrix\\secind_matrix";
+    string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\result\\result";
+    string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\time\\time";
+    string mpi_time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\mpi_time\\mpi_time_";
+
+    int num_processes = world_size;
     int EXPIREMENTS_COUNTS = 10;
     int size = 100;
 
     for (int i = 0; i < EXPIREMENTS_COUNTS; i++) {
-        vector<vector<int>> first_matrix = GenerateMatrix(size);
-        WriteMatrix(first_matrix_path, size, first_matrix);
-        vector<vector<int>> second_matrix = GenerateMatrix(size);
-        WriteMatrix(second_matrix_path, size, second_matrix);
-        auto start = std::chrono::high_resolution_clock::now();
-        vector<vector<int>> result = MultyMatrx(first_matrix, second_matrix);
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        WriteMatrix(result_path, size, result);
-        WriteTime(time_path, size, duration_ms.count());
+        vector<vector<int>> first_matrix, second_matrix, result;
+
+        if (world_rank == 0) {
+            try {
+                first_matrix = ReadMatrix(first_matrix_path, size);
+                second_matrix = ReadMatrix(second_matrix_path, size);
+            }
+            catch (const exception& e) {
+                cerr << "Error reading matrices: " << e.what() << endl;
+                MPI_Abort(MPI_COMM_WORLD, 1);
+            }
+        }
+
+        MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        if (world_rank != 0) {
+            first_matrix.resize(size, vector<int>(size));
+            second_matrix.resize(size, vector<int>(size));
+        }
+
+        for (int row = 0; row < size; row++) {
+            MPI_Bcast(second_matrix[row].data(), size, MPI_INT, 0, MPI_COMM_WORLD);
+        }
+
+        int rows_per_proc = size / world_size;
+        if (world_rank == 0) {
+            for (int dest = 1; dest < world_size; dest++) {
+                int start_row = dest * rows_per_proc;
+                int end_row = (dest == world_size - 1) ? size : start_row + rows_per_proc;
+
+                for (int row = start_row; row < end_row; row++) {
+                    MPI_Send(first_matrix[row].data(), size, MPI_INT, dest, 0, MPI_COMM_WORLD);
+                }
+            }
+        }
+        else {
+            int start_row = world_rank * rows_per_proc;
+            int end_row = (world_rank == world_size - 1) ? size : start_row + rows_per_proc;
+
+            for (int row = start_row; row < end_row; row++) {
+                MPI_Recv(first_matrix[row].data(), size, MPI_INT, 0, 0,
+                    MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            }
+        }
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        double start_time = MPI_Wtime();
+
+        result = MultyMatrxMPI(first_matrix, second_matrix, world_size, world_rank);
+
+        double end_time = MPI_Wtime();
+        int duration_ms = (int)((end_time - start_time) * 1000);
+
+        if (world_rank == 0) {
+            try {
+                WriteTimeMPI(mpi_time_path, size, duration_ms, num_processes);
+                cout << "Size: " << size << " Time: " << duration_ms << " ms" << endl;
+            }
+            catch (const exception& e) {
+                cerr << "Error writing time: " << e.what() << endl;
+            }
+        }
+
         size += 100;
     }
-    cout << "complete" << endl;
+
+    if (world_rank == 0) {
+        cout << "Complete" << endl;
+    }
+
+    MPI_Finalize();
+    return 0;
 }
 
 
