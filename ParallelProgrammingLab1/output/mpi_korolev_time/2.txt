@@ -1,0 +1,13 @@
+whoami: cannot find name for user ID 1121069315
+Total processes: 2
+Matrix size: 100x100 | Time: 11 ms
+Matrix size: 200x200 | Time: 82 ms
+Matrix size: 300x300 | Time: 278 ms
+Matrix size: 400x400 | Time: 680 ms
+Matrix size: 500x500 | Time: 1290 ms
+Matrix size: 600x600 | Time: 2040 ms
+Matrix size: 700x700 | Time: 3440 ms
+Matrix size: 800x800 | Time: 5008 ms
+Matrix size: 900x900 | Time: 7219 ms
+Matrix size: 1000x1000 | Time: 9926 ms
+Complete

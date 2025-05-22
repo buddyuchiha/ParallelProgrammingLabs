@@ -180,6 +180,8 @@ int main(int argc, char** argv)
     string result_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\result\\result";
     string time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\time\\time";
     string mpi_time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\mpi_time\\mpi_time_";
+    string mpi_korolev_time_path = "C:\\Users\\Pro10\\OneDrive\\Рабочий стол\\ParallelProgrammingLabs\\ParallelProgrammingLab1\\output\\mpi_korolev_time\\mpi_korolev_time_";
+
 
     int num_processes = world_size;
     int EXPIREMENTS_COUNTS = 10;
@@ -241,7 +243,7 @@ int main(int argc, char** argv)
 
         if (world_rank == 0) {
             try {
-                WriteTimeMPI(mpi_time_path, size, duration_ms, num_processes);
+                WriteTimeMPI(mpi_korolev_time_path, size, duration_ms, num_processes);
                 cout << "Size: " << size << " Time: " << duration_ms << " ms" << endl;
             }
             catch (const exception& e) {
