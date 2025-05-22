@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include <mpi.h>
+#include <iostream>
 #include <vector>
 #include <chrono>
 #include <fstream>
@@ -60,6 +61,42 @@ vector<vector<int>> MultyMatrx(vector<vector<int>> first_matrix, vector<vector<i
     return result_matrix;
 }
 
+vector<vector<int>> MultyMatrxMPI(vector<vector<int>>& first_matrix, vector<vector<int>>& second_matrix, int world_size, int world_rank) {
+    int n = first_matrix.size();
+    vector<vector<int>> result_matrix(n, vector<int>(n, 0));
+
+    int rows_per_proc = n / world_size;
+    int start_row = world_rank * rows_per_proc;
+    int end_row = (world_rank == world_size - 1) ? n : start_row + rows_per_proc;
+
+    for (int i = start_row; i < end_row; i++) {
+        for (int j = 0; j < n; j++) {
+            result_matrix[i][j] = 0;
+            for (int k = 0; k < n; k++) {
+                result_matrix[i][j] += first_matrix[i][k] * second_matrix[k][j];
+            }
+        }
+    }
+
+    if (world_rank == 0) {
+        for (int src = 1; src < world_size; src++) {
+            int src_start = src * rows_per_proc;
+            int src_end = (src == world_size - 1) ? n : src_start + rows_per_proc;
+
+            for (int i = src_start; i < src_end; i++) {
+                MPI_Recv(result_matrix[i].data(), n, MPI_INT, src, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            }
+        }
+    }
+    else {
+        for (int i = start_row; i < end_row; i++) {
+            MPI_Send(result_matrix[i].data(), n, MPI_INT, 0, 0, MPI_COMM_WORLD);
+        }
+    }
+
+    return result_matrix;
+}
+
 void PrintMatrix(vector<vector<int>> matrix) {
     int rows = matrix.size();
     int columns = matrix[0].size();
@@ -86,6 +123,23 @@ void WriteMatrix(string path, int size, vector<vector<int>> matrix) {
     }
     outfile << "\n";
     outfile.close();
+}
+
+vector<vector<int>> ReadMatrix(string path, int size) {
+    string file_path = path + to_string(size) + ".txt";
+    ifstream infile(file_path, ios::out);
+    if (!infile.is_open()) {
+        throw "File not found";
+    }
+    vector<vector<int>> matrix(size, vector<int>(size));
+    int rows = size;
+    int columns = size;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            infile >> matrix[i][j];
+        }
+    }
+    return matrix;
 }
 
 void WriteTime(string path, int size, int time) {
